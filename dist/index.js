@@ -88,6 +88,7 @@ function getStations() {
         });
     });
 }
+exports.getStations = getStations;
 function getStationRacks(stationId) {
     return __awaiter(this, void 0, void 0, function* () {
         let url = new URL(baseURL.toJSON());
@@ -107,6 +108,7 @@ function getStationRacks(stationId) {
         return racks;
     });
 }
+exports.getStationRacks = getStationRacks;
 function rentBike(stationId, rackNum) {
     return __awaiter(this, void 0, void 0, function* () {
         let rentForm = {
@@ -126,6 +128,7 @@ function rentBike(stationId, rackNum) {
         return;
     });
 }
+exports.rentBike = rentBike;
 function getRentStatus() {
     return __awaiter(this, void 0, void 0, function* () {
         let url = new URL(baseURL.toJSON());
@@ -136,13 +139,7 @@ function getRentStatus() {
         return trimmedStr;
     });
 }
-function getRemainPeriod() {
-    let url = new URL(baseURL.toJSON());
-    url.pathname = '/svc/svcInfo.do';
-    return withCookies.get(url.toJSON()).then(res => {
-        console.log(res);
-    });
-}
+exports.getRentStatus = getRentStatus;
 function initAPI(id, pw) {
     //Reset cookie jar
     withCookies = superagent.agent();
@@ -151,4 +148,5 @@ function initAPI(id, pw) {
     //Login and set mobile
     return loginAccount(id, pw).then(setMobile).then(mobile => loginAccount(id, pw, mobile));
 }
+exports.initAPI = initAPI;
 //# sourceMappingURL=index.js.map

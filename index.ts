@@ -71,7 +71,7 @@ class Station {
   }
 }
 
-async function getStations(): Promise<Station[]> {
+export async function getStations(): Promise<Station[]> {
   let url = new URL(baseURL.toJSON())
   url.pathname = '/terminal/getTmMapState.do'
   let stationRes = await withCookies.get(url.toJSON())
@@ -89,7 +89,7 @@ interface Rack {
   avail: boolean
 }
 
-async function getStationRacks(stationId: string): Promise<Rack[]> {
+export async function getStationRacks(stationId: string): Promise<Rack[]> {
   let url = new URL(baseURL.toJSON())
   url.pathname = '/rent/getRackLentRead.do'
   url.searchParams.set('tmid', stationId)
@@ -107,7 +107,7 @@ async function getStationRacks(stationId: string): Promise<Rack[]> {
   return racks
 }
 
-async function rentBike(stationId: string, rackNum: string): Promise<void> {
+export async function rentBike(stationId: string, rackNum: string): Promise<void> {
   let rentForm = {
     tmid: stationId,
     rackid: rackNum,
@@ -125,7 +125,7 @@ async function rentBike(stationId: string, rackNum: string): Promise<void> {
   return
 }
 
-async function getRentStatus(): Promise<string> {
+export async function getRentStatus(): Promise<string> {
   let url = new URL(baseURL.toJSON())
   url.pathname = '/svc/rentInfo.do'
   let rentStatRes = await withCookies.get(url.toJSON())
@@ -134,15 +134,7 @@ async function getRentStatus(): Promise<string> {
   return trimmedStr
 }
 
-function getRemainPeriod(): Promise<void> {
-  let url = new URL(baseURL.toJSON())
-  url.pathname = '/svc/svcInfo.do'
-  return withCookies.get(url.toJSON()).then(res => {
-     console.log(res)
-  })
-}
-
-function initAPI (id: string, pw: string) {
+export function initAPI (id: string, pw: string) {
   //Reset cookie jar
   withCookies = superagent.agent()
 
