@@ -131,7 +131,11 @@ export async function getRentStatus(): Promise<string> {
   let rentStatRes = await withCookies.get(url.toJSON())
   let trimmedStr = rentStatRes.text.substr(rentStatRes.text.indexOf('impact"> ') + 8).trim().replace(/\s+/g, ' ')
   trimmedStr = trimmedStr.substr(0, trimmedStr.indexOf('</span>'))
-  return trimmedStr
+  if(trimmedStr.includes('반납') || trimmedStr.includes('대여')) {
+    return trimmedStr
+  } else {
+    throw 'Cannot fetch rent status! May be not logined?'
+  }
 }
 
 export function initAPI (id: string, pw: string) {
