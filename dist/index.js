@@ -124,6 +124,9 @@ function rentBike(stationId, rackNum, bikeNo) {
             .type('form')
             .send(rentForm);
         if (rentRes.text.indexOf('오류입니다.') == -1 || rentRes.text.indexOf('대여실패') == -1) {
+            if (rentRes.text.indexOf('자전거번호를 다시 확인하십시요!') != -1) {
+                throw 'Invalid Bike Num!';
+            }
             throw 'Invalid request!';
         }
         return;
