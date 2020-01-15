@@ -107,11 +107,12 @@ export async function getStationRacks(stationId: string): Promise<Rack[]> {
   return racks
 }
 
-export async function rentBike(stationId: string, rackNum: string): Promise<void> {
+export async function rentBike(stationId: string, rackNum: string, bikeNo: string): Promise<void> {
   let rentForm = {
     tmid: stationId,
     rackid: rackNum,
     fullrackid: stationId + rackNum,
+    bikeno: bikeNo,
     tmname: undefined
   }
   let url = new URL(baseURL.toJSON())
@@ -119,8 +120,8 @@ export async function rentBike(stationId: string, rackNum: string): Promise<void
   let rentRes = await withCookies.post(url.toJSON())
     .type('form')
     .send(rentForm)
-  if(rentRes.text.indexOf('오류입니다.') == -1) {
-    throw 'Invalid station or rack id!'
+  if(rentRes.text.indexOf('오류입니다.') == -1 || rentRes.text.indexOf('대여실패') == -1) {
+    throw 'Invalid request!'
   }
   return
 }

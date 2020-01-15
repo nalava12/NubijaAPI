@@ -109,12 +109,13 @@ function getStationRacks(stationId) {
     });
 }
 exports.getStationRacks = getStationRacks;
-function rentBike(stationId, rackNum) {
+function rentBike(stationId, rackNum, bikeNo) {
     return __awaiter(this, void 0, void 0, function* () {
         let rentForm = {
             tmid: stationId,
             rackid: rackNum,
             fullrackid: stationId + rackNum,
+            bikeno: bikeNo,
             tmname: undefined
         };
         let url = new URL(baseURL.toJSON());
@@ -122,8 +123,8 @@ function rentBike(stationId, rackNum) {
         let rentRes = yield withCookies.post(url.toJSON())
             .type('form')
             .send(rentForm);
-        if (rentRes.text.indexOf('오류입니다.') == -1) {
-            throw 'Invalid station or rack id!';
+        if (rentRes.text.indexOf('오류입니다.') == -1 || rentRes.text.indexOf('대여실패') == -1) {
+            throw 'Invalid request!';
         }
         return;
     });
