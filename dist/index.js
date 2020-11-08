@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,14 +27,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.initAPI = exports.getRentStatus = exports.rentBike = exports.getStationRacks = exports.getStations = void 0;
 const superagent = __importStar(require("superagent"));
 const baseURL = new URL('https://app.nubija.com');
 //Make cookie persistent
@@ -34,7 +47,7 @@ function loginAccount(id, pw, mobile) {
         let loginRes = yield withCookies.post(url.toJSON())
             .type('form')
             .send(loginForm);
-        if (loginRes.text.indexOf('등록된 사용자가 없거나 비밀번호가 잘못되었습니다.') != -1) {
+        if (loginRes.text.includes('등록된 사용자가 없거나 비밀번호가 잘못되었습니다.')) {
             throw 'Invalid ID or password!';
         }
     });
@@ -102,7 +115,7 @@ function getStationRacks(stationId) {
         let racks = allButtons.map(button => {
             return {
                 num: button.substr(button.indexOf('">') + 2).slice(0, -9),
-                avail: button.indexOf('rental_able') != -1
+                avail: button.includes('rental_able')
             };
         });
         return racks;
@@ -123,8 +136,8 @@ function rentBike(stationId, rackNum, bikeNo) {
         let rentRes = yield withCookies.post(url.toJSON())
             .type('form')
             .send(rentForm);
-        if (rentRes.text.indexOf('오류입니다.') == -1 || rentRes.text.indexOf('대여실패') == -1) {
-            if (rentRes.text.indexOf('자전거번호를 다시 확인하십시요!') != -1) {
+        if (rentRes.text.includes('오류입니다.') || rentRes.text.includes('대여실패')) {
+            if (rentRes.text.includes('자전거번호를 다시 확인하십시요!')) {
                 throw 'Invalid Bike Num!';
             }
             throw 'Invalid request!';

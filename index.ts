@@ -18,7 +18,7 @@ async function loginAccount(id: string, pw: string, mobile?: string): Promise<vo
   let loginRes = await withCookies.post(url.toJSON())
     .type('form')
     .send(loginForm)
-  if(loginRes.text.indexOf('등록된 사용자가 없거나 비밀번호가 잘못되었습니다.') != -1) {
+  if (loginRes.text.includes('등록된 사용자가 없거나 비밀번호가 잘못되었습니다.')) {
     throw 'Invalid ID or password!'
   }
 }
@@ -37,7 +37,7 @@ async function setMobile(): Promise<string> {
   setMobileUrl.pathname = '/user/setMobileDo.do'
   await withCookies.post(setMobileUrl.toJSON())
     .type('form')
-    .send({mobile : mobile})
+    .send({ mobile: mobile })
 
   //After set mobile, should logout to update JSESSIONID
   let logoutUrl = new URL(baseURL.toJSON())
@@ -76,7 +76,7 @@ export async function getStations(): Promise<Station[]> {
   url.pathname = '/terminal/getTmMapState.do'
   let stationRes = await withCookies.get(url.toJSON())
   let terminals = stationRes.text.match(/terminalDrow.+;/g)
-  if(terminals == null) {
+  if (terminals == null) {
     throw 'Invalid Data!'
   }
   return terminals.map(terminal => terminal.substr(14).slice(0, -3).split(/',\s*'/)).map(arr => {
@@ -95,13 +95,13 @@ export async function getStationRacks(stationId: string): Promise<Rack[]> {
   url.searchParams.set('tmid', stationId)
   let racksRes = await withCookies.get(url.toJSON())
   let allButtons = racksRes.text.match(/<button.+/g)
-  if(allButtons == null) {
+  if (allButtons == null) {
     throw 'Racks are not exist!'
   }
   let racks: Rack[] = allButtons.map(button => {
     return {
       num: button.substr(button.indexOf('">') + 2).slice(0, -9),
-      avail: button.indexOf('rental_able') != -1
+      avail: button.includes('rental_able')
     }
   })
   return racks
@@ -120,8 +120,8 @@ export async function rentBike(stationId: string, rackNum: string, bikeNo: strin
   let rentRes = await withCookies.post(url.toJSON())
     .type('form')
     .send(rentForm)
-  if(rentRes.text.indexOf('오류입니다.') == -1 || rentRes.text.indexOf('대여실패') == -1) {
-    if(rentRes.text.indexOf('자전거번호를 다시 확인하십시요!') != -1) {
+  if (rentRes.text.includes('오류입니다.') || rentRes.text.includes('대여실패')) {
+    if (rentRes.text.includes('자전거번호를 다시 확인하십시요!')) {
       throw 'Invalid Bike Num!'
     }
     throw 'Invalid request!'
@@ -135,14 +135,14 @@ export async function getRentStatus(): Promise<string> {
   let rentStatRes = await withCookies.get(url.toJSON())
   let trimmedStr = rentStatRes.text.substr(rentStatRes.text.indexOf('impact"> ') + 8).trim().replace(/\s+/g, ' ')
   trimmedStr = trimmedStr.substr(0, trimmedStr.indexOf('</span>'))
-  if(trimmedStr.includes('반납') || trimmedStr.includes('대여')) {
+  if (trimmedStr.includes('반납') || trimmedStr.includes('대여')) {
     return trimmedStr
   } else {
     throw 'Cannot fetch rent status! May be not logined?'
   }
 }
 
-export function initAPI (id: string, pw: string) {
+export function initAPI(id: string, pw: string) {
   //Reset cookie jar
   withCookies = superagent.agent()
 
